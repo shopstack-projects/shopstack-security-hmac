@@ -14,43 +14,49 @@ small. You will need to define a compatible logger implementation in your projec
 
 You can use the `HmacVerifier` class to authenticate Shopify requests, using the HMAC codes and message body.
 
-    String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
-    String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
-    String message = httpRequest.getBody();
+```java
+String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
+String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
+String message = httpRequest.getBody();
 
-    boolean result = new HmacVerifier(sharedSecret).apply(shopifyHmac, message);
-    
-    if (!result) {
-        // Request message could not be authenticated.
-    }
+boolean result = new HmacVerifier(sharedSecret).apply(shopifyHmac, message);
+
+if (!result) {
+    // Request message could not be authenticated.
+}
+```
 
 ## Use Cases
 
-    String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
-    String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
-    
-    // Use the message body for Shopify Webhook requests.
-    String message = httpRequest.getBody();
+```java
+String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
+String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
 
-    // Or, construct a message from the request query parameters if authenticating a Shopify HTTP GET request. 
-    Map<String, String> queryParams = httpRequest.getQueryParameters();
-    String message = queryParams.keySet().stream()
-        .map(key -> key + "=" + queryParams.get(key))
-        .collect(joining("&"));
+// Use the message body for Shopify Webhook requests.
+String message = httpRequest.getBody();
 
-    // You can verify the request with the HMAC and message.
-    boolean result = new HmacVerifier(sharedSecret).apply(shopifyHmac, message);
-    
-    if (!result) {
-        // Request message could not be authenticated.
-    }
+// Or, construct a message from the request query parameters if authenticating a Shopify HTTP GET request. 
+Map<String, String> queryParams = httpRequest.getQueryParameters();
+String message = queryParams.keySet().stream()
+    .map(key -> key + "=" + queryParams.get(key))
+    .collect(joining("&"));
+
+// You can verify the request with the HMAC and message.
+boolean result = new HmacVerifier(sharedSecret).apply(shopifyHmac, message);
+
+if (!result) {
+    // Request message could not be authenticated.
+}
+```
     
 This library also allows you to generate a HMAC code if you need to.
 
-    String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
-    String message = "Hello world".
+```java
+String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
+String message = "Hello world".
 
-    String hmac = new HmacGenerator(sharedSecret).apply(message);
+String hmac = new HmacGenerator(sharedSecret).apply(message);
+```
 
 ## License
 
