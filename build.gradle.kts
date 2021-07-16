@@ -1,5 +1,6 @@
 plugins {
     java
+    id("io.freefair.lombok") version Versions.lombokPlugin
 }
 
 group = "dev.shopstack.security"
@@ -15,8 +16,13 @@ repositories {
 }
 
 dependencies {
+    implementation(Dependencies.slf4jApi)
+    testImplementation(Dependencies.slf4jSimpleLogger)
+
     testImplementation(Dependencies.junitJupiterApi)
     testRuntimeOnly(Dependencies.junitJupiterEngine)
+    testImplementation(Dependencies.junitJupiterParams)
+    testImplementation(Dependencies.assertjCore)
 }
 
 tasks {
