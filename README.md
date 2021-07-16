@@ -28,6 +28,10 @@ if (!result) {
 
 ## Use Cases
 
+Note, if the Shopify HTTP request includes the HMAC in a `hmac` query parameter instead of a `X-Shopify-Hmac-Sha256`
+header, you will need to remove the `hmac` query parameter before creating a message body to verify against.
+This is documented [here](https://shopify.dev/apps/auth/oauth#remove-the-hmac).
+
 ```java
 String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
 String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
