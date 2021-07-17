@@ -1,46 +1,52 @@
 # Shopstack Security HMAC
 
-Verify the authenticity of Shopify requests and redirects by validating the request against the included
-[HMAC](https://shopify.dev/apps/auth/oauth#verification) code.
+Authenticate Shopify [requests](https://shopify.dev/apps/auth/oauth#verification) and
+[webhooks](https://shopify.dev/apps/webhooks#6-verify-a-webhook), by validating the message against the included HMAC
+code. 
 
 [![Build](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml)
 
-## Dependencies
+## Getting Started
 
-This library uses the [SLF4J API Module](https://mvnrepository.com/artifact/org.slf4j/slf4j-api), and we haven't bundled
-a SLF4J compatible implementation library so that we can keep our artifact size small. You should define a SLF4J
-compatible logger implementation in your project.
+_Maven configuration coming soon._
+
+### SLF4J
+
+This library uses the SLF4J API module without an implementation library, to keep our artifact size small.
+You should include an SLF4J compatible logger implementation in your project.
+
+```xml
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>2.0.0-alpha2</version>
+</dependency>
+```
 
 ## Usage
 
-You can use the `HmacVerifier` class to authenticate Shopify requests, using the HMAC codes and message body.
-
-```java
-String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
-String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
-String message = httpRequest.getBody();
-
-boolean result = new HmacVerifier(sharedSecret).apply(hmac, message);
-
-if (!result) {
-    // Request message could not be authenticated.
-}
-```
-
-## Use Cases
-
 ### Verify a HMAC
 
+Use the `HmacVerifier` to authenticate a Shopify request by evaluating the provided HMAC code against the message body.
+
+Each Shopify request and redirect may include the HMAC code in either a `X-Shopify-Hmac-Sha256` HTTP header or in a
+`hmac` query parameter.
+
+The message to use for comparison will typically consist of either the HTTP request body, or the request's query parameters.
+When using query parameters, be sure to first [remove the `hmac` query parameter](https://shopify.dev/apps/auth/oauth#remove-the-hmac).
+
 ```java
 String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
 String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
 
-// 1. Use the message body for Shopify Webhook requests.
+// 1. Use the request body.
 String message = httpRequest.getBody();
 
-// 2. Construct a message from the request query parameters.
+// 2. Use the query parameters.
 Map<String, String> queryParams = httpRequest.getQueryParameters();
+
 String message = queryParams.keySet().stream()
+    .filter(key -> !key.equalsIgnoreCase("hmac"))
     .map(key -> key + "=" + queryParams.get(key))
     .collect(joining("&"));
 
@@ -48,15 +54,9 @@ String message = queryParams.keySet().stream()
 boolean result = new HmacVerifier(sharedSecret).apply(hmac, message);
 
 if (!result) {
-    // Request message could not be authenticated.
+    // Shopify message could not be verified.
 }
 ```
-
-#### Remove the HMAC query parameter.
-
-In cases where the Shopify HTTP request provides a HMAC in a `hmac` query parameter instead of in a
-`X-Shopify-Hmac-Sha256` header, you will need to exclude the `hmac` query parameter from the constructed message body
-before you can verify the HMAC. This is documented [here](https://shopify.dev/apps/auth/oauth#remove-the-hmac).
 
 ### Generate a HMAC
 
@@ -67,6 +67,15 @@ String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
 String message = "Hello world".
 
 String hmac = new HmacGenerator(sharedSecret).apply(message);
+```
+
+## Building from Source
+
+You don't need to build from source, but if you want to try it out, you can use the included Gradle wrapper.
+You will also need JDK 11.
+
+```shell
+$ ./gradlew clean test build --info
 ```
 
 ## License
