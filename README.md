@@ -3,7 +3,7 @@
 Verify the authenticity of Shopify requests and redirects by validating the request against the included
 [HMAC](https://shopify.dev/apps/auth/oauth#verification) code.
 
-[![Build](https://github.com/alanguerin/shopstack-security-hmac/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/alanguerin/shopstack-security-hmac/actions/workflows/build.yml)
+[![Build](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml)
 
 ## Dependencies
 
