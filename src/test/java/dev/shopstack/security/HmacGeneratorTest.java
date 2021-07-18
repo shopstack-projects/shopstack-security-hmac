@@ -1,9 +1,10 @@
 package dev.shopstack.security;
 
 import dev.shopstack.security.hmac.HmacGenerator;
-import dev.shopstack.security.hmac.exception.HmacGenerationFailureException;
+import dev.shopstack.security.hmac.exception.HmacGeneratorInitializationException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,66 +35,72 @@ import static org.mockito.Mockito.mockStatic;
 @ExtendWith(MockitoExtension.class)
 public final class HmacGeneratorTest {
 
-    private HmacGenerator generator;
+    @Nested
+    class Constructor {
 
-    @BeforeEach
-    void beforeEach() {
-        generator = new HmacGenerator(generateSecret());
-    }
+        @Test
+        void constructor_whenMacAlgorithmDoesNotExist_thenExpectException() {
+            try (MockedStatic<Mac> mac = mockStatic(Mac.class)) {
+                mac.when(() -> Mac.getInstance("HmacSHA256"))
+                    .thenThrow(new NoSuchAlgorithmException());
 
-    @RepeatedTest(3)
-    void apply_whenContentIsValid_thenExpectSuccess() {
-        String content = generateContent();
-
-        String hmac = generator.apply(content);
-        log.info("Generated HMAC: {}", hmac);
-        assertThat(hmac).isNotBlank();
-    }
-
-    @ParameterizedTest
-    @EmptySource
-    void apply_whenContentIsEmpty_thenExpectSuccess(String content) {
-        String hmac = generator.apply(content);
-        log.info("Generated HMAC: {}", hmac);
-        assertThat(hmac).isNotBlank();
-    }
-
-    @ParameterizedTest
-    @NullSource
-    void apply_whenContentIsNull_thenExpectException(String content) {
-        assertThatThrownBy(() -> generator.apply(content))
-            .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    void apply_whenMacAlgorithmDoesNotExist_thenExpectException() {
-        String content = generateContent();
-
-        try (MockedStatic<Mac> mac = mockStatic(Mac.class)) {
-            mac.when(() -> Mac.getInstance("HmacSHA256"))
-                .thenThrow(new NoSuchAlgorithmException());
-
-            assertThatThrownBy(() -> generator.apply(content))
-                .isInstanceOf(HmacGenerationFailureException.class);
+                assertThatThrownBy(() -> new HmacGenerator(generateSecret()))
+                    .isInstanceOf(HmacGeneratorInitializationException.class);
+            }
         }
+
+        @Test
+        void constructor_whenMacInitializedWithBadKeySpec_thenExpectException() throws InvalidKeyException {
+            try (MockedStatic<Mac> mac = mockStatic(Mac.class)) {
+                Mac macInstance = mock(Mac.class);
+
+                mac.when(() -> Mac.getInstance(anyString()))
+                    .thenReturn(macInstance);
+
+                doThrow(new InvalidKeyException())
+                    .when(macInstance).init(any(SecretKeySpec.class));
+
+                assertThatThrownBy(() -> new HmacGenerator(generateSecret()))
+                    .isInstanceOf(HmacGeneratorInitializationException.class);
+            }
+        }
+
     }
 
-    @Test
-    void apply_whenMacInitializedWithBadKeySpec_thenExpectException() throws InvalidKeyException {
-        String content = generateContent();
+    @Nested
+    class Apply {
 
-        try (MockedStatic<Mac> mac = mockStatic(Mac.class)) {
-            Mac macInstance = mock(Mac.class);
+        private HmacGenerator generator;
 
-            mac.when(() -> Mac.getInstance(anyString()))
-                .thenReturn(macInstance);
-
-            doThrow(new InvalidKeyException())
-                .when(macInstance).init(any(SecretKeySpec.class));
-
-            assertThatThrownBy(() -> generator.apply(content))
-                .isInstanceOf(HmacGenerationFailureException.class);
+        @BeforeEach
+        void beforeEach() {
+            generator = new HmacGenerator(generateSecret());
         }
+
+        @RepeatedTest(3)
+        void apply_whenContentIsValid_thenExpectSuccess() {
+            String content = generateContent();
+
+            String hmac = generator.apply(content);
+            log.info("Generated HMAC: {}", hmac);
+            assertThat(hmac).isNotBlank();
+        }
+
+        @ParameterizedTest
+        @EmptySource
+        void apply_whenContentIsEmpty_thenExpectSuccess(String content) {
+            String hmac = generator.apply(content);
+            log.info("Generated HMAC: {}", hmac);
+            assertThat(hmac).isNotBlank();
+        }
+
+        @ParameterizedTest
+        @NullSource
+        void apply_whenContentIsNull_thenExpectException(String content) {
+            assertThatThrownBy(() -> generator.apply(content))
+                .isInstanceOf(NullPointerException.class);
+        }
+
     }
 
     /* Fixtures */
