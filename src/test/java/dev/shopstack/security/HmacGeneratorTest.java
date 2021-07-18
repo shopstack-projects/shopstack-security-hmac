@@ -18,6 +18,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.stream.IntStream;
 
 import static dev.shopstack.security.test.RandomStringUtils.randomAlphaNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,7 +78,7 @@ public final class HmacGeneratorTest {
             generator = new HmacGenerator(generateSecret());
         }
 
-        @RepeatedTest(3)
+        @Test
         void apply_whenContentIsValid_thenExpectSuccess() {
             String content = generateContent();
 
@@ -99,6 +100,17 @@ public final class HmacGeneratorTest {
         void apply_whenContentIsNull_thenExpectException(String content) {
             assertThatThrownBy(() -> generator.apply(content))
                 .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        void apply_givenMultipleSequentialCalls_whenContentIsValid_thenExpectSuccess() {
+            IntStream.rangeClosed(1, 3).forEach(i -> {
+                String content = generateContent();
+
+                String hmac = generator.apply(content);
+                log.info("Generated HMAC {}: {}", i, hmac);
+                assertThat(hmac).isNotBlank();
+            });
         }
 
     }
