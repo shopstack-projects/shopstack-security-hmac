@@ -70,7 +70,7 @@ public final class HmacGeneratorTest {
         String content = generateContent();
 
         try (MockedStatic<Mac> mac = mockStatic(Mac.class)) {
-            mac.when(() -> Mac.getInstance("HmacSHA2561"))
+            mac.when(() -> Mac.getInstance("HmacSHA256"))
                 .thenThrow(new NoSuchAlgorithmException());
 
             assertThatThrownBy(() -> generator.apply(content))
@@ -84,7 +84,9 @@ public final class HmacGeneratorTest {
 
         try (MockedStatic<Mac> mac = mockStatic(Mac.class)) {
             Mac macInstance = mock(Mac.class);
-            mac.when(() -> Mac.getInstance(anyString())).thenReturn(macInstance);
+
+            mac.when(() -> Mac.getInstance(anyString()))
+                .thenReturn(macInstance);
 
             doThrow(new InvalidKeyException())
                 .when(macInstance).init(any(SecretKeySpec.class));
