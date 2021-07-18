@@ -13,19 +13,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 @Slf4j
 @Getter
-public class HmacVerifier implements BiFunction<String, String, Boolean> {
+public final class HmacVerifier implements BiFunction<String, String, Boolean> {
 
     private final String secret;
-
     private final HmacGenerator generator;
 
-    public HmacVerifier(String secret) {
+    public HmacVerifier(final String secret) {
         this.secret = secret;
         this.generator = new HmacGenerator(secret);
     }
 
     /**
-     * Verify the provided HMAC by computing a new HMAC code for comparison.
+     * Verify the provided HMAC by computing a new HMAC code before performing a comparison.
      */
     @Override
     public Boolean apply(final String hmac, final String content) {

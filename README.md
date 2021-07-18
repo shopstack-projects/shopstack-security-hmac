@@ -5,6 +5,7 @@ Authenticate Shopify [requests](https://shopify.dev/apps/auth/oauth#verification
 code. 
 
 [![Build](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/4b15e3f1c123432eb7d274bcc083b199)](https://www.codacy.com/gh/shopstack-projects/shopstack-security-hmac/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=shopstack-projects/shopstack-security-hmac&amp;utm_campaign=Badge_Grade)
 
 ## Getting Started
 
@@ -19,7 +20,6 @@ You should include an SLF4J compatible logger implementation in your project.
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-api</artifactId>
-    <version>2.0.0-alpha2</version>
 </dependency>
 ```
 

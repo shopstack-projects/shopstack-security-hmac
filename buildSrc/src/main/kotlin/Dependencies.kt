@@ -1,5 +1,9 @@
+/**
+ * Version reference for project dependencies.
+ */
 object Versions {
     const val lombokPlugin = "6.0.0-m2"
+    const val checkstyle   = "8.44"
 
     // Testing
     const val junitJupiter = "5.8.0-M1"
@@ -9,6 +13,9 @@ object Versions {
     const val slf4j        = "2.0.0-alpha2"
 }
 
+/**
+ * Project dependency reference.
+ */
 object Dependencies {
     // Testing
     const val junitJupiterApi    = "org.junit.jupiter:junit-jupiter-api:${Versions.junitJupiter}"
