@@ -1,9 +1,17 @@
 package dev.shopstack.security.test;
 
+import lombok.NoArgsConstructor;
+
 import java.util.Random;
 import java.util.stream.IntStream;
 
-public class RandomStringGenerator {
+import static lombok.AccessLevel.PRIVATE;
+
+/**
+ * Utility class for generating random strings.
+ */
+@NoArgsConstructor(access = PRIVATE)
+public final class RandomStringUtils {
 
     private static final String SALT_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
 

@@ -1,6 +1,7 @@
 plugins {
     java
     id("io.freefair.lombok") version Versions.lombokPlugin
+    checkstyle
 }
 
 group = "dev.shopstack.security"
@@ -31,5 +32,9 @@ tasks {
             maxParallelForks = Runtime.getRuntime().availableProcessors()
         }
         failFast = true
+    }
+
+    checkstyle {
+        toolVersion = Versions.checkstyle
     }
 }

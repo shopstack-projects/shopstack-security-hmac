@@ -19,7 +19,6 @@ You should include an SLF4J compatible logger implementation in your project.
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-api</artifactId>
-    <version>2.0.0-alpha2</version>
 </dependency>
 ```
 

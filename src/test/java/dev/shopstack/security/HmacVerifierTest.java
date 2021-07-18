@@ -8,12 +8,15 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 
-import static dev.shopstack.security.test.RandomStringGenerator.randomAlphaNumeric;
+import static dev.shopstack.security.test.RandomStringUtils.randomAlphaNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * Test suite for {@link HmacVerifier}.
+ */
 @Slf4j
-public class HmacVerifierTest {
+public final class HmacVerifierTest {
 
     private HmacVerifier verifier;
     private HmacGenerator generator;

@@ -24,7 +24,10 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-  
+
+    - name: Checkstyle
+      run: ./gradlew --build-cache check --info
+
     - name: Test
       run: ./gradlew --build-cache test --info
       
