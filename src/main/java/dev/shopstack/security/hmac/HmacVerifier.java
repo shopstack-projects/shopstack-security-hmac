@@ -20,7 +20,7 @@ public final class HmacVerifier implements BiFunction<String, String, Boolean> {
     }
 
     /**
-     * Verify the provided HMAC by computing a new HMAC code before performing a comparison.
+     * Verify the provided HMAC by computing a new HMAC code and performing a comparison.
      */
     @Override
     public Boolean apply(final String hmac, final String content) {
