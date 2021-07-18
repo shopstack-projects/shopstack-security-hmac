@@ -29,7 +29,13 @@ jobs:
       run: ./gradlew --build-cache checkstyleMain checkstyleTest --info
 
     - name: Test
-      run: ./gradlew --build-cache test --info
+      run: ./gradlew --build-cache test jacocoTestReport --info
+
+    - name: Codacy Coverage Reporter
+      uses: codacy/codacy-coverage-reporter-action@v1
+      with:
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        coverage-reports: build/reports/jacoco/test/jacocoTestReport.xml
 
     - name: Build
       run: ./gradlew --build-cache build --info

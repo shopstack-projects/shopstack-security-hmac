@@ -1,7 +1,6 @@
 package dev.shopstack.security.hmac;
 
 import dev.shopstack.security.hmac.exception.HmacGenerationFailureException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +17,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Verifies a SHA-256 cryptographic HMAC (hash-based message authentication code).
  */
 @Slf4j
-@Getter
 @RequiredArgsConstructor
 public final class HmacGenerator implements Function<String, String> {
 
@@ -43,8 +41,8 @@ public final class HmacGenerator implements Function<String, String> {
             return Base64.getEncoder().encodeToString(macData);
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            log.error("Unable to compute a message authentication code.", e);
-            throw new HmacGenerationFailureException("Unable to compute a message authentication code.", e);
+            log.error("Unable to compute an authentication code.", e);
+            throw new HmacGenerationFailureException("Unable to compute an authentication code.", e);
         }
     }
 
