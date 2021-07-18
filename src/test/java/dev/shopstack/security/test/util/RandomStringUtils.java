@@ -1,4 +1,4 @@
-package dev.shopstack.security.test;
+package dev.shopstack.security.test.util;
 
 import lombok.NoArgsConstructor;
 
