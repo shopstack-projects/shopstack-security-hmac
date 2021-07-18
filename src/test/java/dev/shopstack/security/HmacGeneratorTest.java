@@ -1,9 +1,11 @@
 package dev.shopstack.security;
 
 import dev.shopstack.security.hmac.HmacGenerator;
+import dev.shopstack.security.hmac.exception.HmacGenerationFailureException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;

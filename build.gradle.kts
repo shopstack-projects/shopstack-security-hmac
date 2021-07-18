@@ -2,6 +2,7 @@ plugins {
     java
     id("io.freefair.lombok") version Versions.lombokPlugin
     checkstyle
+    jacoco
 }
 
 group = "dev.shopstack.security"
@@ -26,6 +27,14 @@ dependencies {
     testImplementation(Dependencies.assertjCore)
 }
 
+checkstyle {
+    toolVersion = Versions.checkstyle
+}
+
+jacoco {
+    toolVersion = Versions.jacoco
+}
+
 tasks {
     test {
         useJUnitPlatform {
@@ -34,7 +43,9 @@ tasks {
         failFast = true
     }
 
-    checkstyle {
-        toolVersion = Versions.checkstyle
+    jacocoTestReport {
+        reports {
+            xml.required.set(true)
+        }
     }
 }

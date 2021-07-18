@@ -1,6 +1,5 @@
 package dev.shopstack.security.hmac;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.MessageDigest;
@@ -12,14 +11,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Provides methods to generate and verify HMACs (hash-based message authentication codes).
  */
 @Slf4j
-@Getter
 public final class HmacVerifier implements BiFunction<String, String, Boolean> {
 
-    private final String secret;
     private final HmacGenerator generator;
 
     public HmacVerifier(final String secret) {
-        this.secret = secret;
         this.generator = new HmacGenerator(secret);
     }
 
