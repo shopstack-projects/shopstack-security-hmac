@@ -5,8 +5,11 @@ import dev.shopstack.security.hmac.HmacVerifier;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
+
+import java.util.stream.IntStream;
 
 import static dev.shopstack.security.test.RandomStringUtils.randomAlphaNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +32,7 @@ public final class HmacVerifierTest {
         generator = new HmacGenerator(secret);
     }
 
-    @RepeatedTest(3)
+    @Test
     void apply_whenContentIsValid_thenExpectSuccess() {
         String content = generateContent();
 
@@ -41,7 +44,7 @@ public final class HmacVerifierTest {
         assertThat(result).isTrue();
     }
 
-    @RepeatedTest(3)
+    @Test
     void apply_whenContentHasChanged_thenExpectFailure() {
         String content = generateContent();
 
@@ -72,6 +75,20 @@ public final class HmacVerifierTest {
 
         assertThatThrownBy(() -> verifier.apply(hmac, content))
             .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void apply_givenMultipleSequentialCalls_whenContentIsValid_thenExpectSuccess() {
+        IntStream.rangeClosed(1, 3).forEach(i -> {
+            String content = generateContent();
+
+            String hmac = generator.apply(content);
+            log.info("Generated HMAC {}: {}", i, hmac);
+            assertThat(hmac).isNotBlank();
+
+            boolean result = verifier.apply(hmac, content);
+            assertThat(result).isTrue();
+        });
     }
 
     /* Fixtures */
