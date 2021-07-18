@@ -4,6 +4,7 @@ Authenticate Shopify [requests](https://shopify.dev/apps/auth/oauth#verification
 [webhooks](https://shopify.dev/apps/webhooks#6-verify-a-webhook), by validating the message against the included HMAC
 code. 
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/76c61294c0f44f9781d33ec7cad26379)](https://app.codacy.com/gh/shopstack-projects/shopstack-security-hmac?utm_source=github.com&utm_medium=referral&utm_content=shopstack-projects/shopstack-security-hmac&utm_campaign=Badge_Grade_Settings)
 [![Build](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/shopstack-projects/shopstack-security-hmac/actions/workflows/build.yml)
 
 ## Getting Started
