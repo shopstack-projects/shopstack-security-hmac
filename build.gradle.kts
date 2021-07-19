@@ -25,7 +25,6 @@ dependencies {
     testRuntimeOnly(Dependencies.junitJupiterEngine)
     testImplementation(Dependencies.junitJupiterParams)
     testImplementation(Dependencies.assertjCore)
-
     testImplementation(Dependencies.mockitoInline)
     testImplementation(Dependencies.mockitoJunitJupiter)
 }
@@ -44,6 +43,10 @@ tasks {
             maxParallelForks = Runtime.getRuntime().availableProcessors()
         }
         failFast = true
+    }
+
+    jar {
+        from(sourceSets.main.get().allSource)
     }
 
     jacocoTestReport {

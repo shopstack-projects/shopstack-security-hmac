@@ -22,18 +22,23 @@ public final class HmacGenerator implements Function<String, String> {
 
     private final Mac mac;
 
+    public HmacGenerator(final String secret) {
+        this.mac = initMac(secret);
+    }
+
     /**
-     * Create a new {@link HmacGenerator} instance.
+     * Initialize a new {@link Mac} instance.
      *
      * @throws HmacGeneratorInitializationException if the HMAC generator cannot be initialized.
      */
-    public HmacGenerator(final String secret) {
+    private Mac initMac(final String secret) {
         try {
-            this.mac = Mac.getInstance(HMAC_SHA256);
+            Mac mac = Mac.getInstance(HMAC_SHA256);
 
             SecretKeySpec keySpec = new SecretKeySpec(secret.getBytes(UTF_8), HMAC_SHA256);
             mac.init(keySpec);
 
+            return mac;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             log.error("Unable to initialize the HMAC generator.", e);
             throw new HmacGeneratorInitializationException("Unable to initialize the HMAC generator.", e);
