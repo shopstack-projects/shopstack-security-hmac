@@ -9,6 +9,9 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+
+    withSourcesJar()
+    withJavadocJar()
 }
 
 repositories {
@@ -35,6 +38,8 @@ jacoco {
     toolVersion = Versions.jacoco
 }
 
+
+
 tasks {
     test {
         useJUnitPlatform {
@@ -48,42 +53,27 @@ tasks {
             xml.required.set(true)
         }
     }
-
-    val sourcesJar by creating(Jar::class) {
-        archiveClassifier.set("sources")
-        from(sourceSets.main.get().allSource)
-    }
-
-    val javadocJar by creating(Jar::class) {
-        dependsOn.add(javadoc)
-        archiveClassifier.set("javadoc")
-        from(javadoc)
-    }
-
-    artifacts {
-        archives(sourcesJar)
-        archives(javadocJar)
-        archives(jar)
-    }
 }
 
 publishing {
+    val artifactVersion = "1.0.0"
+
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = "dev.shopstack.security"
             artifactId = "shopstack-security-hmac"
-            version = "1.0.0"
+            version = artifactVersion
 
             from(components["java"])
 
             pom {
                 name.set("Shopstack Security HMAC")
-                description.set("A library to authenticate Shopify requests using the provided HMAC.")
+                description.set("Authenticate Shopify requests using the provided HMAC.")
                 url.set("https://shopstack.dev")
                 scm {
                     connection.set("scm:git:git://github.com/shopstack-projects/shopstack-security-hmac.git")
                     developerConnection.set("scm:git:ssh://github.com/shopstack-projects/shopstack-security-hmac.git")
-                    url.set("https://github.com/shopstack-projects/shopstack-security-hmac/")
+                    url.set("https://github.com/shopstack-projects/shopstack-security-hmac/tree/main")
                 }
                 licenses {
                     license {
@@ -96,10 +86,20 @@ publishing {
                     developer {
                         id.set("alanguerin")
                         name.set("Alan Guerin")
-                        email.set("alan@alanguerin.com")
+                        email.set("hello@alanguerin.com")
                     }
                 }
             }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "SonatypeOSS"
+            val sonatypeBaseUri = "https://s01.oss.sonatype.org/content/repositories"
+            val releasesRepo = uri("$sonatypeBaseUri/releases")
+            val snapshotsRepo = uri("$sonatypeBaseUri/snapshots")
+            url = snapshotsRepo // FIXME if (artifactVersion.endsWith("RELEASE")) releasesRepo else snapshotsRepo
         }
     }
 }
