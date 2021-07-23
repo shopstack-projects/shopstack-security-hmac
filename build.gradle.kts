@@ -103,7 +103,7 @@ tasks {
     }
 
     signing {
-        isRequired = version.toString().endsWith("RELEASE")
+        isRequired = true // FIXME version.toString().endsWith("RELEASE")
         sign(publishing.publications["mavenJava"])
     }
 
