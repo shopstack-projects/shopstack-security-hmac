@@ -35,10 +35,10 @@ jobs:
             gpg-private-key: "${{ secrets.GPG_PRIVATE_KEY }}"
 
         - name: Generate Legacy Format of GPG Secret Keyring
-          run: gpg --keyring secring.gpg --export-secret-keys > /root/.gnupg/secring.gpg
+          run: gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg
 
         - name: Publish Package
-          run: ./gradlew publish --info -Psigning.secretKeyRingFile=/root/.gnupg/secring.gpg
+          run: ./gradlew publishToMavenLocal --info -Psigning.secretKeyRingFile=~/.gnupg/secring.gpg
           env:
             ORG_GRADLE_PROJECT_sonatypeOSSUsername: "${{ secrets.SONATYPE_USERNAME }}"
             ORG_GRADLE_PROJECT_sonatypeOSSPassword: "${{ secrets.SONATYPE_TOKEN }}"
