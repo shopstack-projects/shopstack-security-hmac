@@ -4,7 +4,10 @@ plugins {
     checkstyle
     jacoco
     `maven-publish`
+    signing
 }
+
+version = "1.0.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -38,31 +41,12 @@ jacoco {
     toolVersion = Versions.jacoco
 }
 
-
-
-tasks {
-    test {
-        useJUnitPlatform {
-            maxParallelForks = Runtime.getRuntime().availableProcessors()
-        }
-        failFast = true
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.required.set(true)
-        }
-    }
-}
-
 publishing {
-    val artifactVersion = "1.0.0"
 
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = "dev.shopstack.security"
             artifactId = "shopstack-security-hmac"
-            version = artifactVersion
 
             from(components["java"])
 
@@ -99,7 +83,28 @@ publishing {
             val sonatypeBaseUri = "https://s01.oss.sonatype.org/content/repositories"
             val releasesRepo = uri("$sonatypeBaseUri/releases")
             val snapshotsRepo = uri("$sonatypeBaseUri/snapshots")
-            url = snapshotsRepo // FIXME if (artifactVersion.endsWith("RELEASE")) releasesRepo else snapshotsRepo
+            url = if (version.toString().endsWith("RELEASE")) releasesRepo else snapshotsRepo
         }
     }
+}
+
+tasks {
+    test {
+        useJUnitPlatform {
+            maxParallelForks = Runtime.getRuntime().availableProcessors()
+        }
+        failFast = true
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.required.set(true)
+        }
+    }
+
+    signing {
+        isRequired = version.toString().endsWith("RELEASE")
+        sign(publishing.publications["mavenJava"])
+    }
+
 }

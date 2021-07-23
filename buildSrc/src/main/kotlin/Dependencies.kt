@@ -2,7 +2,7 @@
  * Version reference for project dependencies.
  */
 object Versions {
-    const val lombokPlugin = "6.0.0-m2"
+    const val lombokPlugin = "6.1.0-m1"
     const val checkstyle   = "8.44"
     const val jacoco       = "0.8.7"
 

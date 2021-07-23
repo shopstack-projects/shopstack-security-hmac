@@ -1,8 +1,6 @@
 name: Publish to Maven Central
 
-on:
-  release:
-    types: [ published ]
+on: push
 
 jobs:
 
@@ -30,8 +28,17 @@ jobs:
             restore-keys: |
               ${{ runner.os }}-gradle-
 
+        - name: Import GPG Key
+          id: import_gpg
+          uses: crazy-max/ghaction-import-gpg@v3
+          with:
+            gpg-private-key: "${{ secrets.GPG_PRIVATE_KEY }}"
+
+        - name: Generate Legacy Format of GPG Secret Keyring
+          run: gpg --keyring secring.gpg --export-secret-keys > /root/.gnupg/secring.gpg
+
         - name: Publish Package
-          run: ./gradlew publishToMavenLocal --info
+          run: ./gradlew publish --info -Psigning.secretKeyRingFile=/root/.gnupg/secring.gpg
           env:
-            ORG_GRADLE_PROJECT_sonatypeOSSUsername=: "${{ secrets.SONATYPE_OSSRH_USERNAME }}"
-            ORG_GRADLE_PROJECT_sonatypeOSSPassword: "${{ secrets.SONATYPE_OSSRH_TOKEN }}"
+            ORG_GRADLE_PROJECT_sonatypeOSSUsername: "${{ secrets.SONATYPE_USERNAME }}"
+            ORG_GRADLE_PROJECT_sonatypeOSSPassword: "${{ secrets.SONATYPE_TOKEN }}"
