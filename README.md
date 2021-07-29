@@ -10,7 +10,15 @@ code.
 
 ## Getting Started
 
-_Maven configuration coming soon._
+Project artifacts can be downloaded from the [Maven Central Repository](https://search.maven.org/artifact/dev.shopstack.security/shopstack-security-hmac).
+
+```xml
+<dependency>
+    <groupId>dev.shopstack.security</groupId>
+    <artifactId>shopstack-security-hmac</artifactId>
+    <version>1.0.0.RELEASE</version>
+</dependency>
+```
 
 ### SLF4J
 
