@@ -1,3 +1,5 @@
+import java.util.*
+
 plugins {
     java
     id("io.freefair.lombok") version Versions.lombokPlugin
@@ -83,7 +85,7 @@ publishing {
             val sonatypeBaseUri = "https://s01.oss.sonatype.org/content/repositories"
             val releasesRepo = uri("$sonatypeBaseUri/releases")
             val snapshotsRepo = uri("$sonatypeBaseUri/snapshots")
-            url = if (version.toString().endsWith("RELEASE")) releasesRepo else snapshotsRepo
+            url = if (isReleaseBuild()) releasesRepo else snapshotsRepo
         }
     }
 }
@@ -103,8 +105,21 @@ tasks {
     }
 
     signing {
-        isRequired = true // FIXME version.toString().endsWith("RELEASE")
-        sign(publishing.publications["mavenJava"])
+        isRequired = isReleaseBuild()
+
+        val signingKey: String? by project
+        val signingPassword: String? by project
+
+        if (signingKey != null) {
+            useInMemoryPgpKeys(base64Decode(signingKey), signingPassword)
+            sign(publishing.publications["mavenJava"])
+        }
     }
 
 }
+
+fun isReleaseBuild() =
+    version.toString().contains("RELEASE")
+
+fun base64Decode(s: String?) =
+    s?.let { String(Base64.getDecoder().decode(it)).trim() }
