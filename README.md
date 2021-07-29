@@ -89,7 +89,7 @@ You can also generate a HMAC code if you need to using the `HmacGenerator`.
 
 ```java
 String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
-String message = "Hello world".
+String message = "Hello world";
 
 String hmac = new HmacGenerator(sharedSecret).apply(message);
 ```
