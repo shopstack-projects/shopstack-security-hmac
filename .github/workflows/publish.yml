@@ -33,7 +33,7 @@ jobs:
         - name: Publish Package
           run: ./gradlew publish --info
           env:
-            ORG_GRADLE_PROJECT_sonatypeOSSUsername: "${{ secrets.SONATYPE_USERNAME }}"
-            ORG_GRADLE_PROJECT_sonatypeOSSPassword: "${{ secrets.SONATYPE_TOKEN }}"
+            ORG_GRADLE_PROJECT_SonatypeOSSUsername: "${{ secrets.SONATYPE_USERNAME }}"
+            ORG_GRADLE_PROJECT_SonatypeOSSPassword: "${{ secrets.SONATYPE_TOKEN }}"
             ORG_GRADLE_PROJECT_signingKey: "${{ secrets.GPG_SIGNING_KEY }}"
             ORG_GRADLE_PROJECT_signingPassword: "${{ secrets.GPG_PASSPHRASE }}"
