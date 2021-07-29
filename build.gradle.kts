@@ -9,7 +9,7 @@ plugins {
     signing
 }
 
-version = "1.0.0"
+version = "1.0.0-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -82,10 +82,13 @@ publishing {
     repositories {
         maven {
             name = "SonatypeOSS"
-            val sonatypeBaseUri = "https://s01.oss.sonatype.org/content/repositories"
-            val releasesRepo = uri("$sonatypeBaseUri/releases")
-            val snapshotsRepo = uri("$sonatypeBaseUri/snapshots")
+
+            val baseUri = "https://s01.oss.sonatype.org/content/repositories"
+            val releasesRepo = uri("$baseUri/releases")
+            val snapshotsRepo = uri("$baseUri/snapshots")
             url = if (isReleaseBuild()) releasesRepo else snapshotsRepo
+
+            credentials(PasswordCredentials::class)
         }
     }
 }
