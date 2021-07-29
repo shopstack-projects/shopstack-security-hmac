@@ -9,7 +9,7 @@ plugins {
     signing
 }
 
-version = "1.0.0.RELEASE"
+version = "1.0.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
