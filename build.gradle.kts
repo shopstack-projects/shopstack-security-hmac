@@ -9,7 +9,7 @@ plugins {
     signing
 }
 
-version = "1.0.0"
+version = "1.0.0.RELEASE"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -111,7 +111,7 @@ tasks {
         val signingPassword: String? by project
 
         if (signingKey != null) {
-            useInMemoryPgpKeys(base64Decode(signingKey), signingPassword)
+            useInMemoryPgpKeys(base64Decode(signingKey), base64Decode(signingPassword))
             sign(publishing.publications["mavenJava"])
         }
     }
