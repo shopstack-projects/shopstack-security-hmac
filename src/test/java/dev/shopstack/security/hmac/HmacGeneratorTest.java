@@ -2,12 +2,14 @@ package dev.shopstack.security.hmac;
 
 import dev.shopstack.security.hmac.exception.HmacGeneratorInitializationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base16;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +20,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.stream.IntStream;
 
+import static dev.shopstack.security.hmac.Encoding.BASE16;
+import static dev.shopstack.security.hmac.Encoding.BASE64;
 import static dev.shopstack.security.test.util.RandomStringUtils.randomAlphaNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -117,6 +121,17 @@ public final class HmacGeneratorTest {
             });
 
             assertThat(true).isTrue(); // Passes PMD checks.
+        }
+
+        @ParameterizedTest
+        @EnumSource(Encoding.class)
+        void apply_givenDifferentEncodings_thenExpectSuccess(Encoding encoding) {
+            generator = new HmacGenerator(generateSecret(), encoding);
+            String content = generateContent();
+
+            String hmac = generator.apply(content);
+            log.info("Generated HMAC: {}", hmac);
+            assertThat(hmac).isNotBlank();
         }
 
     }

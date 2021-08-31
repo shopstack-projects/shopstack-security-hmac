@@ -5,10 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.security.MessageDigest;
 import java.util.function.BiFunction;
 
+import static dev.shopstack.security.hmac.Encoding.BASE64;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Provides methods to generate and verify HMACs (hash-based message authentication codes).
+ * Verifies a SHA-256 based HMAC (hash-based message authentication code).
  */
 @Slf4j
 public final class HmacVerifier implements BiFunction<String, String, Boolean> {
@@ -16,7 +17,11 @@ public final class HmacVerifier implements BiFunction<String, String, Boolean> {
     private final HmacGenerator generator;
 
     public HmacVerifier(final String secret) {
-        this.generator = new HmacGenerator(secret);
+        this.generator = new HmacGenerator(secret, BASE64);
+    }
+
+    public HmacVerifier(final String secret, final Encoding encoding)  {
+        this.generator = new HmacGenerator(secret, encoding);
     }
 
     /**

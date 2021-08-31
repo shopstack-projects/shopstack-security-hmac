@@ -1,19 +1,24 @@
 package dev.shopstack.security.hmac;
 
+import dev.shopstack.security.hmac.exception.HmacEncodingException;
 import dev.shopstack.security.hmac.exception.HmacGeneratorInitializationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.BinaryEncoder;
+import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.binary.Base16;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.function.Function;
 
+import static dev.shopstack.security.hmac.Encoding.BASE16;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Verifies a SHA-256 cryptographic HMAC (hash-based message authentication code).
+ * Generates a SHA-256 based HMAC (hash-based message authentication code).
  */
 @Slf4j
 public final class HmacGenerator implements Function<String, String> {
@@ -21,9 +26,16 @@ public final class HmacGenerator implements Function<String, String> {
     private static final String HMAC_SHA256 = "HmacSHA256";
 
     private final Mac mac;
+    private final BinaryEncoder encoder;
 
     public HmacGenerator(final String secret) {
         this.mac = initMac(secret);
+        this.encoder = new Base64();
+    }
+
+    public HmacGenerator(final String secret, final Encoding encoding) {
+        this.mac = initMac(secret);
+        this.encoder = buildEncoder(encoding);
     }
 
     /**
@@ -46,12 +58,28 @@ public final class HmacGenerator implements Function<String, String> {
     }
 
     /**
-     * Generate a HMAC code for the provided content.
+     * Generate a new HMAC code for the provided content.
      */
     @Override
     public String apply(final String content) {
-        byte[] macData = mac.doFinal(content.getBytes(UTF_8));
-        return Base64.getEncoder().encodeToString(macData);
+        try {
+            byte[] macData = mac.doFinal(content.getBytes(UTF_8));
+            return new String(encoder.encode(macData), UTF_8);
+        } catch (EncoderException e) {
+            log.error("Unable to encode the HMAC.", e);
+            throw new HmacEncodingException("Unable to encode the HMAC.", e);
+        }
+    }
+
+    /**
+     * Create a {@link BinaryEncoder} object using the provided {@link Encoding}.
+     */
+    private BinaryEncoder buildEncoder(Encoding encoding) {
+        if (encoding == BASE16) {
+            return new Base16(true);
+        }
+
+        return new Base64();
     }
 
 }

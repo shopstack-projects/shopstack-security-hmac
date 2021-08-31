@@ -41,19 +41,19 @@ Use the `HmacVerifier` to authenticate a Shopify request by evaluating the provi
 Shopify HTTP requests and redirects may include the HMAC code in either a `X-Shopify-Hmac-Sha256` HTTP header or in a
 `hmac` query parameter.
 
-The message to use for comparison will typically consist of either the HTTP request body (for POST requests), or the
-request's query parameters (for GET requests).
+The message to use when generating a comparison HMAC will either consist of the HTTP request body (for POST requests),
+or the request's query parameters (for GET requests).
 
-#### Scenario 1 - Using HTTP Body
+#### Scenario 1 - Using the HTTP Body
 
 ```java
-String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
+String secret = System.getenv("SHOPIFY_SHARED_SECRET");
 String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
 
 String message = httpRequest.getBody();
 
 // Verify the request using the HMAC and message.
-boolean result = new HmacVerifier(sharedSecret).apply(hmac, message);
+boolean result = new HmacVerifier(secret).apply(hmac, message);
 
 if (!result) {
     // Shopify message could not be verified.
@@ -65,18 +65,49 @@ if (!result) {
 When using query parameters, be sure to first [remove the `hmac` query parameter](https://shopify.dev/apps/auth/oauth#remove-the-hmac).
 
 ```java
-String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
-String hmac = httpRequest.getHeader("X-Shopify-Hmac-Sha256");
+String secret = System.getenv("SHOPIFY_SHARED_SECRET");
 
-Map<String, String> queryParams = httpRequest.getQueryParameters();
+Map<String, String> queryParameters = httpRequest.getQueryParameters();
 
-String message = queryParams.keySet().stream()
+String hmac = queryParameters.get("hmac");
+    
+String message = queryParameters.keySet().stream()
     .filter(key -> !key.equalsIgnoreCase("hmac"))
     .map(key -> key + "=" + queryParams.get(key))
+    .sorted() // Lexicographic order is required.
     .collect(joining("&"));
 
 // Verify the request using the HMAC and message.
-boolean result = new HmacVerifier(sharedSecret).apply(hmac, message);
+boolean result = new HmacVerifier(secret).apply(hmac, message);
+
+if (!result) {
+    // Shopify message could not be verified.
+}
+```
+
+#### Scenario 3 - Using a Base16 (Hexadecimal) Encoding
+
+Shopify encodes the HMAC value in Base16 (Hexadecimal) for requests used when granting permissions to an application.
+You can configure the data encoding when creating the `HmacVerifier`.
+
+We default to using a Base64 encoding otherwise, which is suitable for other Shopify requests.
+
+```java
+String secret = System.getenv("SHOPIFY_SHARED_SECRET");
+
+Map<String, String> queryParameters = httpRequest.getQueryParameters();
+
+String hmac = queryParameters.get("hmac");
+
+String message = queryParameters.keySet().stream()
+    .filter(key -> !key.equalsIgnoreCase("hmac"))
+    .map(key -> key + "=" + queryParams.get(key))
+    .sorted() // Lexicographic order is required.
+    .collect(joining("&"));
+
+// Verify the request using the HMAC and message.
+boolean result = new HmacVerifier(secret, Encoding.BASE16) // Specify a Base16 encoding as required.
+    .apply(hmac, message);
 
 if (!result) {
     // Shopify message could not be verified.
@@ -85,13 +116,13 @@ if (!result) {
 
 ### Generate a HMAC
 
-You can also generate a HMAC code if you need to using the `HmacGenerator`.
+You can also generate a HMAC code directly using the `HmacGenerator`.
 
 ```java
-String sharedSecret = System.getenv("SHOPIFY_SHARED_SECRET");
+String secret = System.getenv("SHOPIFY_SHARED_SECRET");
 String message = "Hello world";
 
-String hmac = new HmacGenerator(sharedSecret).apply(message);
+String hmac = new HmacGenerator(secret).apply(message);
 ```
 
 ## Building from Source
