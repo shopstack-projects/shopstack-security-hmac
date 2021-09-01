@@ -2,8 +2,10 @@ package dev.shopstack.security.hmac;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 
 import java.util.stream.IntStream;
@@ -18,76 +20,105 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Slf4j
 public final class HmacVerifierTest {
 
-    private HmacVerifier verifier;
-    private HmacGenerator generator;
+    /**
+     * Test cases for {@link HmacVerifier#apply(String, String)}.
+     */
+    @Nested
+    class Apply {
 
-    @BeforeEach
-    void beforeEach() {
-        String secret = generateSecret();
+        private HmacVerifier verifier;
+        private HmacGenerator generator;
 
-        verifier = new HmacVerifier(secret);
-        generator = new HmacGenerator(secret);
-    }
+        @BeforeEach
+        void beforeEach() {
+            String secret = generateSecret();
 
-    @Test
-    void apply_whenContentIsValid_thenExpectSuccess() {
-        String content = generateContent();
+            verifier = new HmacVerifier(secret);
+            generator = new HmacGenerator(secret);
+        }
 
-        String hmac = generator.apply(content);
-        log.info("Generated HMAC: {}", hmac);
-        assertThat(hmac).isNotBlank();
-
-        boolean result = verifier.apply(hmac, content);
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void apply_whenContentHasChanged_thenExpectFailure() {
-        String content = generateContent();
-
-        String hmac = generator.apply(content);
-        log.info("Generated HMAC: {}", hmac);
-        assertThat(hmac).isNotBlank();
-
-        String newContent = generateContent();
-        assertThat(content).isNotEqualTo(newContent);
-
-        boolean result = verifier.apply(hmac, newContent);
-        assertThat(result).isFalse();
-    }
-
-    @ParameterizedTest
-    @NullSource
-    void apply_whenHmacIsNull_thenExpectException(String hmac) {
-        String content = generateContent();
-
-        assertThatThrownBy(() -> verifier.apply(hmac, content))
-            .isInstanceOf(NullPointerException.class);
-    }
-
-    @ParameterizedTest
-    @NullSource
-    void apply_whenContentIsNull_thenExpectException(String content) {
-        String hmac = generator.apply(generateContent());
-
-        assertThatThrownBy(() -> verifier.apply(hmac, content))
-            .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    void apply_givenMultipleSequentialCalls_whenContentIsValid_thenExpectSuccess() {
-        IntStream.rangeClosed(1, 3).forEach(i -> {
+        @Test
+        void apply_whenContentIsValid_thenExpectSuccess() {
             String content = generateContent();
 
             String hmac = generator.apply(content);
-            log.info("Generated HMAC {}: {}", i, hmac);
+            log.info("Generated HMAC: {}", hmac);
             assertThat(hmac).isNotBlank();
 
             boolean result = verifier.apply(hmac, content);
             assertThat(result).isTrue();
-        });
+        }
 
-        assertThat(true).isTrue(); // Passes PMD checks.
+        @Test
+        void apply_whenContentHasChanged_thenExpectFailure() {
+            String content = generateContent();
+
+            String hmac = generator.apply(content);
+            log.info("Generated HMAC: {}", hmac);
+            assertThat(hmac).isNotBlank();
+
+            String newContent = generateContent();
+            assertThat(content).isNotEqualTo(newContent);
+
+            boolean result = verifier.apply(hmac, newContent);
+            assertThat(result).isFalse();
+        }
+
+        @ParameterizedTest
+        @NullSource
+        void apply_whenHmacIsNull_thenExpectException(String hmac) {
+            String content = generateContent();
+
+            assertThatThrownBy(() -> verifier.apply(hmac, content))
+                .isInstanceOf(NullPointerException.class);
+        }
+
+        @ParameterizedTest
+        @NullSource
+        void apply_whenContentIsNull_thenExpectException(String content) {
+            String hmac = generator.apply(generateContent());
+
+            assertThatThrownBy(() -> verifier.apply(hmac, content))
+                .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        void apply_givenMultipleSequentialCalls_whenContentIsValid_thenExpectSuccess() {
+            IntStream.rangeClosed(1, 3).forEach(i -> {
+                String content = generateContent();
+
+                String hmac = generator.apply(content);
+                log.info("Generated HMAC {}: {}", i, hmac);
+                assertThat(hmac).isNotBlank();
+
+                boolean result = verifier.apply(hmac, content);
+                assertThat(result).isTrue();
+            });
+
+            assertThat(true).isTrue(); // Passes PMD checks.
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "BASE16,BASE64",
+            "BASE64,BASE16"
+        })
+        void apply_whenHmacHasDifferentEncoding_thenExpectFailure(Encoding genEncoding, Encoding verEncoding) {
+            String secret = generateSecret();
+
+            HmacGenerator generator = new HmacGenerator(secret, genEncoding);
+            HmacVerifier verifier = new HmacVerifier(secret, verEncoding);
+
+            String content = generateContent();
+
+            String hmac = generator.apply(content);
+            log.info("Generated HMAC using {} encoding: {}", genEncoding, hmac);
+            assertThat(hmac).isNotBlank();
+
+            boolean result = verifier.apply(hmac, content);
+            assertThat(result).isFalse();
+        }
+
     }
 
     /* Fixtures */

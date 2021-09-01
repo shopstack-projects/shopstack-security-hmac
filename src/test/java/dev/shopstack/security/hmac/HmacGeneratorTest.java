@@ -1,19 +1,24 @@
 package dev.shopstack.security.hmac;
 
+import dev.shopstack.security.hmac.exception.HmacEncodingException;
 import dev.shopstack.security.hmac.exception.HmacGeneratorInitializationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.BinaryEncoder;
+import org.apache.commons.codec.EncoderException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.stream.IntStream;
@@ -26,6 +31,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
 
 /**
  * Test suite for {@link HmacGenerator}.
@@ -52,7 +58,7 @@ public final class HmacGeneratorTest {
         }
 
         @Test
-        void constructor_whenMacInitializedWithBadKeySpec_thenExpectException() throws InvalidKeyException {
+        void constructor_whenMacInitializedWithBadKeySpec_thenExpectException() throws Exception {
             try (MockedStatic<Mac> mac = mockStatic(Mac.class)) {
                 Mac macInstance = mock(Mac.class);
 
@@ -79,7 +85,7 @@ public final class HmacGeneratorTest {
 
         @BeforeEach
         void beforeEach() {
-            generator = new HmacGenerator(generateSecret());
+            generator = spy(new HmacGenerator(generateSecret()));
         }
 
         @Test
@@ -117,6 +123,35 @@ public final class HmacGeneratorTest {
             });
 
             assertThat(true).isTrue(); // Passes PMD checks.
+        }
+
+        @ParameterizedTest
+        @EnumSource(Encoding.class)
+        void apply_givenDifferentEncodings_thenExpectSuccess(Encoding encoding) {
+            generator = new HmacGenerator(generateSecret(), encoding);
+            String content = generateContent();
+
+            String hmac = generator.apply(content);
+            log.info("Generated HMAC: {}", hmac);
+            assertThat(hmac).isNotBlank();
+        }
+
+        @ParameterizedTest
+        @EnumSource(Encoding.class)
+        void apply_whenEncodingFails_thenExpectException(Encoding encoding) throws Exception {
+            generator = new HmacGenerator(generateSecret(), encoding);
+
+            // Overwrite the generator's internal encoder.
+            Field encoderField = generator.getClass().getDeclaredField("encoder");
+            encoderField.setAccessible(true);
+
+            BinaryEncoder encoder = mock(BinaryEncoder.class);
+            encoderField.set(generator, encoder);
+
+            doThrow(new EncoderException()).when(encoder).encode(any());
+
+            assertThatThrownBy(() -> generator.apply(generateContent()))
+                .isInstanceOf(HmacEncodingException.class);
         }
 
     }

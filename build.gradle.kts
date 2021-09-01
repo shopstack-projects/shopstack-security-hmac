@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+    implementation(Dependencies.apacheCommonsCodec)
+
     implementation(Dependencies.slf4jApi)
     testImplementation(Dependencies.slf4jSimpleLogger)
 
