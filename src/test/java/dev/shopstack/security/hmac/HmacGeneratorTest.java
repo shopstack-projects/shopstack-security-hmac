@@ -138,7 +138,7 @@ public final class HmacGeneratorTest {
 
         @ParameterizedTest
         @EnumSource(Encoding.class)
-        void constructor_whenEncodingFails_thenExpectException(Encoding encoding) throws Exception {
+        void apply_whenEncodingFails_thenExpectException(Encoding encoding) throws Exception {
             generator = new HmacGenerator(generateSecret(), encoding);
 
             // Overwrite the generator's internal encoder.

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public final class HmacVerifierTest {
 
     /**
-     * Test cases for {@link HmacVerifier#apply(String, String)} when using {@link Encoding#BASE64}.
+     * Test cases for {@link HmacVerifier#apply(String, String)}.
      */
     @Nested
     class Apply {
