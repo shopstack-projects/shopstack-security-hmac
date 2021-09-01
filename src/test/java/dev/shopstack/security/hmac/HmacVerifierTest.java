@@ -5,12 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 
 import java.util.stream.IntStream;
 
-import static dev.shopstack.security.hmac.Encoding.BASE16;
-import static dev.shopstack.security.hmac.Encoding.BASE64;
 import static dev.shopstack.security.test.util.RandomStringUtils.randomAlphaNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,7 +24,7 @@ public final class HmacVerifierTest {
      * Test cases for {@link HmacVerifier#apply(String, String)} when using {@link Encoding#BASE64}.
      */
     @Nested
-    class ApplyUsingBase64Encoding {
+    class Apply {
 
         private HmacVerifier verifier;
         private HmacGenerator generator;
@@ -99,68 +98,24 @@ public final class HmacVerifierTest {
             assertThat(true).isTrue(); // Passes PMD checks.
         }
 
-        @Test
-        void apply_whenHmacIsBase16Encoded_thenExpectFailure() {
+        @ParameterizedTest
+        @CsvSource({
+            "BASE16,BASE64",
+            "BASE64,BASE16"
+        })
+        void apply_whenHmacHasDifferentEncoding_thenExpectFailure(Encoding genEncoding, Encoding verEncoding) {
             String secret = generateSecret();
 
-            HmacGenerator generator = new HmacGenerator(secret, BASE16);
-            HmacVerifier verifier = new HmacVerifier(secret, BASE64);
+            HmacGenerator generator = new HmacGenerator(secret, genEncoding);
+            HmacVerifier verifier = new HmacVerifier(secret, verEncoding);
 
-            String content = generateContent();
-
-            String hmac = generator.apply(content); // Generate Base16
-            log.info("Generated HMAC: {}", hmac);
-            assertThat(hmac).isNotBlank();
-
-            boolean result = verifier.apply(hmac, content); // Verify Base64
-            assertThat(result).isFalse();
-        }
-
-    }
-
-    /**
-     * Test cases for {@link HmacVerifier#apply(String, String)} when using {@link Encoding#BASE16}.
-     */
-    @Nested
-    class ApplyUsingBase16Encoding {
-
-        private HmacVerifier verifier;
-        private HmacGenerator generator;
-
-        @BeforeEach
-        void beforeEach() {
-            String secret = generateSecret();
-
-            verifier = new HmacVerifier(secret, BASE16);
-            generator = new HmacGenerator(secret, BASE16);
-        }
-
-        @Test
-        void apply_whenContentIsValid_thenExpectSuccess() {
             String content = generateContent();
 
             String hmac = generator.apply(content);
-            log.info("Generated HMAC: {}", hmac);
+            log.info("Generated HMAC using {} encoding: {}", genEncoding, hmac);
             assertThat(hmac).isNotBlank();
 
             boolean result = verifier.apply(hmac, content);
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void apply_whenHmacIsBase64Encoded_thenExpectFailure() {
-            String secret = generateSecret();
-
-            HmacGenerator generator = new HmacGenerator(secret, BASE64);
-            HmacVerifier verifier = new HmacVerifier(secret, BASE16);
-
-            String content = generateContent();
-
-            String hmac = generator.apply(content); // Generate Base64
-            log.info("Generated HMAC: {}", hmac);
-            assertThat(hmac).isNotBlank();
-
-            boolean result = verifier.apply(hmac, content); // Verify Base16
             assertThat(result).isFalse();
         }
 

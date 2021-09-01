@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.function.Function;
 
 import static dev.shopstack.security.hmac.Encoding.BASE16;
+import static dev.shopstack.security.hmac.Encoding.BASE64;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -29,8 +30,7 @@ public final class HmacGenerator implements Function<String, String> {
     private final BinaryEncoder encoder;
 
     public HmacGenerator(final String secret) {
-        this.mac = initMac(secret);
-        this.encoder = new Base64();
+        this(secret, BASE64);
     }
 
     public HmacGenerator(final String secret, final Encoding encoding) {
@@ -72,7 +72,7 @@ public final class HmacGenerator implements Function<String, String> {
     }
 
     /**
-     * Create a {@link BinaryEncoder} object using the provided {@link Encoding}.
+     * Create a suitable {@link BinaryEncoder} instance for the provided {@link Encoding}.
      */
     private BinaryEncoder buildEncoder(Encoding encoding) {
         if (encoding == BASE16) {
