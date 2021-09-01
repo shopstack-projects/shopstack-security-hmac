@@ -16,7 +16,7 @@ Project artifacts can be downloaded from the [Maven Central Repository](https://
 <dependency>
     <groupId>dev.shopstack.security</groupId>
     <artifactId>shopstack-security-hmac</artifactId>
-    <version>1.0.0.RELEASE</version>
+    <version>1.1.0.RELEASE</version>
 </dependency>
 ```
 
