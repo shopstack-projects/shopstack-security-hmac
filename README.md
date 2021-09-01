@@ -73,7 +73,7 @@ String hmac = queryParameters.get("hmac");
     
 String message = queryParameters.keySet().stream()
     .filter(key -> !key.equalsIgnoreCase("hmac"))
-    .map(key -> key + "=" + queryParams.get(key))
+    .map(key -> key + "=" + queryParameters.get(key))
     .sorted() // Lexicographic order is required.
     .collect(joining("&"));
 
@@ -101,7 +101,7 @@ String hmac = queryParameters.get("hmac");
 
 String message = queryParameters.keySet().stream()
     .filter(key -> !key.equalsIgnoreCase("hmac"))
-    .map(key -> key + "=" + queryParams.get(key))
+    .map(key -> key + "=" + queryParameters.get(key))
     .sorted() // Lexicographic order is required.
     .collect(joining("&"));
 
