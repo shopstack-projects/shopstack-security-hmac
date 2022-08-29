@@ -2,19 +2,19 @@
  * Version reference for project dependencies.
  */
 object Versions {
-    const val lombokPlugin = "6.1.0"
-    const val checkstyle   = "8.45.1"
-    const val jacoco       = "0.8.7"
+    const val lombokPlugin = "6.5.0.3"
+    const val checkstyle   = "10.3.2"
+    const val jacoco       = "0.8.8"
 
     const val commonsCodec = "1.15"
 
     // Logging
-    const val slf4j        = "2.0.0-alpha5"
+    const val slf4j        = "2.0.0"
 
     // Testing
-    const val junitJupiter = "5.8.0-RC1"
-    const val assertj      = "3.20.2"
-    const val mockito      = "3.12.4"
+    const val junitJupiter = "5.9.0"
+    const val assertj      = "3.23.1"
+    const val mockito      = "4.7.0"
 }
 
 /**
