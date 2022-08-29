@@ -9,7 +9,7 @@ plugins {
     signing
 }
 
-version = "1.1.0.RELEASE"
+version = "1.2.0.RELEASE"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -74,7 +74,7 @@ publishing {
                     developer {
                         id.set("alanguerin")
                         name.set("Alan Guerin")
-                        email.set("hello@alanguerin.com")
+                        email.set("alan@submersive.com")
                     }
                 }
             }
